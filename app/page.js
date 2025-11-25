@@ -5,22 +5,21 @@ import { useState, useEffect } from "react";
 export default function Dashboard() {
   const [tab, setTab] = useState("Approved");
   const [stories, setStories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   async function load() {
-    setLoading(true);
-
     try {
-      let url = "http://100.115.92.206:4000";
+      setLoading(true);
+      const endpoint =
+        tab === "Pending"
+          ? "pending"
+          : tab === "Approved"
+          ? "approved"
+          : "trending";
 
-      if (tab === "Pending") url += "/pending";
-      if (tab === "Approved") url += "/approved";
-      if (tab === "Trending") url += "/trending";
-
-      const res = await fetch(url);
+      const res = await fetch(`http://100.115.92.206:4000/${endpoint}`);
       const json = await res.json();
 
-      // Trending returns an object → convert to list
       if (tab === "Trending") {
         const mapped = Object.keys(json).map((id) => ({
           storyId: id,
@@ -32,11 +31,11 @@ export default function Dashboard() {
         setStories(json);
       }
     } catch (err) {
-      console.error("Error loading:", err);
+      console.error("LOAD ERROR:", err);
       setStories([]);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -44,48 +43,44 @@ export default function Dashboard() {
   }, [tab]);
 
   return (
-    <div style={{ padding: "40px", color: "white" }}>
-      <h1 style={{ fontSize: "28px", marginBottom: "20px" }}>
+    <div className="min-h-screen bg-black text-white p-6">
+      <h1 className="text-3xl font-bold text-cyan-300 mb-8">
         Justice Engine Dashboard
       </h1>
 
-      <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+      <div className="flex gap-3 mb-8">
         {["Pending", "Approved", "Trending"].map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            style={{
-              padding: "10px 20px",
-              background: tab === t ? "#0ff3" : "#333",
-              border: "1px solid #0ff6",
-              borderRadius: "6px",
-              color: "white",
-              cursor: "pointer",
-            }}
+            className={`px-4 py-2 rounded-lg border ${
+              tab === t
+                ? "bg-cyan-300 text-black border-cyan-400"
+                : "border-cyan-300 text-cyan-300 hover:bg-cyan-800"
+            }`}
           >
             {t}
           </button>
         ))}
       </div>
 
-      {loading && <div>Loading…</div>}
+      {loading && <div className="text-cyan-300">Loading…</div>}
 
-      {!loading && stories.length === 0 && <div>No stories found.</div>}
+      {!loading && stories.length === 0 && (
+        <div className="text-gray-500">No stories found.</div>
+      )}
 
       {!loading &&
         stories.length > 0 &&
-        stories.map((s, i) => (
-          <pre
+        stories.map((story, i) => (
+          <div
             key={i}
-            style={{
-              background: "#111",
-              padding: "20px",
-              marginBottom: "20px",
-              borderRadius: "8px",
-            }}
+            className="p-4 mb-4 bg-zinc-900 rounded-lg border border-zinc-700"
           >
-            {JSON.stringify(s, null, 2)}
-          </pre>
+            <pre className="text-xs whitespace-pre-wrap">
+              {JSON.stringify(story, null, 2)}
+            </pre>
+          </div>
         ))}
     </div>
   );
