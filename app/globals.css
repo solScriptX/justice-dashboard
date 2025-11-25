@@ -1,0 +1,39 @@
+/* ---- ENABLE TAILWIND ---- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- YOUR ORIGINAL THEME VARIABLES (kept) ---- */
+:root {
+  --background: #050712;
+  --foreground: #d0faff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+/* ---- DARK MODE SUPPORT ---- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #050712;
+    --foreground: #d0faff;
+  }
+}
+
+/* ---- GLOBAL BODY STYLE ---- */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---- OPTIONAL: scroll glow ---- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: cyan;
+  border-radius: 3px;
+}
