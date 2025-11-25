@@ -10,6 +10,7 @@ export default function Dashboard() {
   async function load() {
     try {
       setLoading(true);
+
       const endpoint =
         tab === "Pending"
           ? "pending"
@@ -71,16 +72,18 @@ export default function Dashboard() {
       </div>
 
       {/* CONTENT */}
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
 
         {loading && (
-          <div className="text-center text-cyan-400 animate-pulse">
+          <div className="text-center text-cyan-400 animate-pulse text-lg">
             Loading…
           </div>
         )}
 
         {!loading && stories.length === 0 && (
-          <div className="text-center text-cyan-600">No stories found.</div>
+          <div className="text-center text-cyan-600 text-lg">
+            No stories found.
+          </div>
         )}
 
         {!loading &&
@@ -88,16 +91,34 @@ export default function Dashboard() {
           stories.map((story, i) => (
             <div
               key={i}
-              className="p-6 rounded-2xl bg-black/40 backdrop-blur-xl
-              border border-cyan-400/20 shadow-[0_0_25px_rgba(0,255,255,0.15)]
-              hover:shadow-[0_0_45px_rgba(0,255,255,0.4)] hover:border-cyan-300
-              transition-all duration-300"
+              className="p-6 rounded-2xl bg-black/40 backdrop-blur-xl border border-cyan-400/20 shadow-[0_0_25px_rgba(0,255,255,0.15)]
+              hover:shadow-[0_0_45px_rgba(0,255,255,0.4)] hover:border-cyan-300 transition-all duration-300"
             >
-              <h2 className="text-xl font-bold text-cyan-300 mb-3">
-                {story.title || `Story: ${story.storyId}`}
+              {/* TITLE */}
+              <h2 className="text-2xl font-bold text-cyan-300 mb-2">
+                {story.title || `Story ${story.storyId}`}
               </h2>
 
-              <pre className="text-xs text-cyan-100/80">
+              {/* METADATA */}
+              <div className="text-xs text-cyan-300/60 mb-4">
+                {story.category && <span>Category: {story.category} • </span>}
+                {story.publishedAt && <span>{story.publishedAt}</span>}
+              </div>
+
+              {/* TRENDING INFO */}
+              {"currentTier" in story && (
+                <div className="flex items-center gap-6 mb-4">
+                  <div className="text-sm text-cyan-200">
+                    <span className="font-bold">Tier:</span> {story.currentTier}
+                  </div>
+                  <div className="text-sm text-cyan-200">
+                    <span className="font-bold">Heat:</span> {story.heat}
+                  </div>
+                </div>
+              )}
+
+              {/* RAW JSON */}
+              <pre className="text-xs text-cyan-100/70 bg-black/30 rounded-xl p-4 overflow-x-auto">
                 {JSON.stringify(story, null, 2)}
               </pre>
             </div>
