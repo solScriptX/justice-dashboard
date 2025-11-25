@@ -9,11 +9,11 @@ import TierDisplay from "../components/TierDisplay";
 import TrendingPanel from "../components/TrendingPanel";
 import StoryActions from "../components/StoryActions";
 
-// IMPORTANT — use your Linux container IP here
+// DIRECT BACKEND URL — guaranteed working
 const api = new JusticeClient("http://100.115.92.206:4000");
 
 export default function DashboardPage() {
-  const [selectedTab, setSelectedTab] = useState("Pending");
+  const [selectedTab, setSelectedTab] = useState("Approved");
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -41,51 +41,31 @@ export default function DashboardPage() {
         setStories(mapped);
       }
     } catch (err) {
-      console.error("Error loading data:", err);
+      console.error("Error loading:", err);
     } finally {
       setLoading(false);
     }
   }
 
-  // Load data when tab changes
   useEffect(() => {
     loadData();
   }, [selectedTab]);
 
-  // Auto-refresh trending
-  useEffect(() => {
-    if (selectedTab !== "Trending") return;
-    const interval = setInterval(() => loadData(), 10000);
-    return () => clearInterval(interval);
-  }, [selectedTab]);
-
   return (
     <div className="p-8 w-full text-cyan-100">
-
-      {/* HEADER */}
-      <div
-        className="w-full text-center mb-12 p-8 rounded-2xl
-        bg-black/30 backdrop-blur-xl border border-cyan-400/20
-        shadow-[0_0_35px_rgba(0,255,255,0.25)]"
-      >
+      <div className="w-full text-center mb-12 p-8 rounded-2xl bg-black/30 backdrop-blur-xl border border-cyan-400/20 shadow-[0_0_35px_rgba(0,255,255,0.25)]">
         <h1 className="text-4xl font-extrabold text-cyan-300 drop-shadow-[0_0_18px_rgba(0,255,255,0.8)]">
           Justice Engine Dashboard
         </h1>
         <p className="text-cyan-200/70 mt-3 text-sm tracking-wide">
-          Real-time monitoring of verified animal rescue stories —
-          from discovery → verification → community-funded justice.
+          Real-time rescue monitoring — pending → approved → trending.
         </p>
       </div>
 
-      {/* TABS */}
       <SectionTabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
-      {/* CONTENT */}
       <div className="space-y-8 mt-8">
-
-        {loading && (
-          <div className="text-center text-cyan-300/60">Loading…</div>
-        )}
+        {loading && <div className="text-center text-cyan-300/60">Loading…</div>}
 
         {!loading && stories.length === 0 && (
           <div className="text-center text-cyan-300/60">No stories found.</div>
@@ -93,12 +73,10 @@ export default function DashboardPage() {
 
         {!loading &&
           stories.length > 0 &&
-          stories.map((story, idx) => (
-            <div key={idx} className="mb-8">
-
+          stories.map((story, i) => (
+            <div key={i} className="mb-6">
               <StoryCard story={story} />
 
-              {/* Tier + Heat */}
               {"currentTier" in story && (
                 <div className="mt-4 flex gap-6 items-center">
                   <TierDisplay tier={story.currentTier} />
@@ -106,7 +84,6 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {/* ACTIONS */}
               <StoryActions
                 storyId={story.storyId}
                 api={api}
